@@ -1,0 +1,44 @@
+class Solution(object):
+    def findMedianSortedArrays(self, nums1, nums2):
+        """
+        :type nums1: List[int]
+        :type nums2: List[int]
+        :rtype: float
+        """
+        # Ensure nums1 is the shorter array for efficiency in binary search
+        if len(nums1) > len(nums2):
+            nums1, nums2 = nums2, nums1
+
+        m, n = len(nums1), len(nums2)
+        total_len_even = (m + n) % 2 == 0
+
+        left, right = 0, m  # Binary search range for partition in nums1
+
+        while left <= right:
+            partition_x = (left + right) // 2  # Partition point in nums1
+            
+            # Calculate the corresponding partition point in nums2
+            # The +1 ensures correct calculation for both even and odd total lengths
+            half_el_count = (m + n + 1) // 2 
+            partition_y = half_el_count - partition_x
+
+            # Determine elements around the partitions
+            max_left_x = float('-inf') if partition_x == 0 else nums1[partition_x - 1]
+            min_right_x = float('inf') if partition_x == m else nums1[partition_x]
+
+            max_left_y = float('-inf') if partition_y == 0 else nums2[partition_y - 1]
+            min_right_y = float('inf') if partition_y == n else nums2[partition_y]
+
+            # Check if the partitions are valid
+            if max_left_x <= min_right_y and max_left_y <= min_right_x:
+                # Partitions are correct, calculate median
+                if total_len_even:
+                    return (max(max_left_x, max_left_y) + min(min_right_x, min_right_y)) / 2.0
+                else:
+                    return float(max(max_left_x, max_left_y))
+            elif max_left_x > min_right_y:
+                # partition_x is too far to the right, move left
+                right = partition_x - 1
+            else:
+                # partition_x is too far to the left, move right
+                left = partition_x + 1
