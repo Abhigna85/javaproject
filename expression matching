@@ -1,0 +1,38 @@
+class Solution(object):
+    def isMatch(self, s, p):
+        """
+        :type s: str
+        :type p: str
+        :rtype: bool
+        """
+        memo = {}  # Dictionary to store results of subproblems (memoization)
+
+        def dp(i, j):
+            """
+            Recursive helper function to determine if s[i:] matches p[j:]
+            """
+            if (i, j) in memo:
+                return memo[(i, j)]
+
+            if j == len(p):  # If pattern is exhausted
+                res = i == len(s)  # Match if string is also exhausted
+            else:
+                # Check if the current characters match (s[i] and p[j])
+                # '.' matches any single character
+                match = i < len(s) and (p[j] == s[i] or p[j] == '.')
+
+                # If the next character in pattern is '*'
+                if j + 1 < len(p) and p[j + 1] == '*':
+                    # Option 1: '*' matches zero occurrences of p[j]
+                    #   (skip p[j] and '*')
+                    # Option 2: '*' matches one or more occurrences of p[j]
+                    #   (match current s[i] with p[j], then continue matching s[i+1:] with p[j:])
+                    res = dp(i, j + 2) or (match and dp(i + 1, j))
+                else:
+                    # If no '*' or '*' is not next, a simple character match is required
+                    res = match and dp(i + 1, j + 1)
+
+            memo[(i, j)] = res  # Store result for memoization
+            return res
+
+        return dp(0, 0)  # Start matching from the beginning of both string and pattern
