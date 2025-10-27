@@ -1,0 +1,35 @@
+class Solution(object):
+    def myAtoi(self, s):
+        """
+        :type s: str
+        :rtype: int
+        """
+        s = s.lstrip()  # 1. Discard leading whitespace
+        if not s:
+            return 0
+
+        sign = 1
+        i = 0
+        if s[0] == '-':  # 2. Determine sign
+            sign = -1
+            i += 1
+        elif s[0] == '+':
+            i += 1
+
+        result = 0
+        INT_MAX = 2**31 - 1
+        INT_MIN = -2**31
+
+        while i < len(s) and s[i].isdigit():  # 3. Extract digits and convert
+            digit = int(s[i])
+            
+            # 5. Check for overflow before adding the digit
+            if sign == 1 and (result > INT_MAX // 10 or (result == INT_MAX // 10 and digit > 7)):
+                return INT_MAX
+            if sign == -1 and (result > abs(INT_MIN) // 10 or (result == abs(INT_MIN) // 10 and digit > 8)):
+                return INT_MIN
+            
+            result = result * 10 + digit
+            i += 1
+
+        return sign * result
